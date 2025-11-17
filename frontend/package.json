@@ -8,7 +8,7 @@
     "build": "tsc -p tsconfig.build.json && vite build",
     "lint": "biome check --write --unsafe --no-errors-on-unmatched --files-ignore-unknown=true ./",
     "preview": "vite preview",
-    "generate-client": "openapi-ts"
+    "generate-client": "curl -s http://localhost:8000/api/v1/openapi.json > openapi.json && npx openapi-typescript-codegen --input ./openapi.json --output ./src/client --client axios && rm openapi.json"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.27.0",
@@ -36,6 +36,7 @@
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react-swc": "^4.2.1",
     "dotenv": "^17.2.2",
+    "openapi-typescript-codegen": "^0.29.0",
     "typescript": "^5.2.2",
     "vite": "^7.1.11"
   }

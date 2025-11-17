@@ -1,220 +1,80 @@
-# Full Stack FastAPI Template
 
-<a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3ATest" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test/badge.svg" alt="Test"></a>
-<a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/full-stack-fastapi-template" target="_blank"><img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/full-stack-fastapi-template.svg" alt="Coverage"></a>
+## Desafio Técnico Full-Stack: Módulo de Gestão de Equipes
 
-## Technology Stack and Features
+O candidato (estagiário) deverá demonstrar habilidade de integrar uma nova funcionalidade em uma base existente. Ele terá 72 horas para completar o desafio.
 
-- ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.
-    - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).
-    - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.
-    - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.
-- 🚀 [React](https://react.dev) for the frontend.
-    - 💃 Using TypeScript, hooks, Vite, and other parts of a modern frontend stack.
-    - 🎨 [Chakra UI](https://chakra-ui.com) for the frontend components.
-    - 🤖 An automatically generated frontend client.
-    - 🧪 [Playwright](https://playwright.dev) for End-to-End testing.
-    - 🦇 Dark mode support.
-- 🐋 [Docker Compose](https://www.docker.com) for development and production.
-- 🔒 Secure password hashing by default.
-- 🔑 JWT (JSON Web Token) authentication.
-- 📫 Email based password recovery.
-- ✅ Tests with [Pytest](https://pytest.org).
-- 📞 [Traefik](https://traefik.io) as a reverse proxy / load balancer.
-- 🚢 Deployment instructions using Docker Compose, including how to set up a frontend Traefik proxy to handle automatic HTTPS certificates.
-- 🏭 CI (continuous integration) and CD (continuous deployment) based on GitHub Actions.
+1. O Projeto Base
 
-### Dashboard Login
+- Backend: FastAPI com padrão de repositório e autenticação.
+- Banco de Dados: Postgres com migrações via Alembic.
+- Frontend: React (Vite) com TypeScript e `shadcn/ui`.
+- Testes: Estrutura de Pytest para o backend.
+- Tooling: `biome.json` e `padrao_commits.md`.
 
-[![API docs](img/login.png)](https://github.com/fastapi/full-stack-fastapi-template)
+O módulo de `Usuarios` já está implementado e deve servir como referência.
 
-### Dashboard - Admin
+2. O Desafio: "Módulo de Gestão de Equipes"
 
-[![API docs](img/dashboard.png)](https://github.com/fastapi/full-stack-fastapi-template)
+O candidato deverá criar Equipes, associar Usuários e construir as rotas e páginas necessárias seguindo os padrões do projeto.
 
-### Dashboard - Create User
+3. Requisitos Funcionais (O Quê)
 
-[![API docs](img/dashboard-create.png)](https://github.com/fastapi/full-stack-fastapi-template)
+A. Backend (FastAPI, Postgres & Alembic)
 
-### Dashboard - Items
+- Modelagem de Dados (Postgres/Alembic):
+    - Tabela `equipes`: Crie uma nova tabela em `models.py` com, no mínimo, `id` e `nome`.
+    - Relação Many-to-Many: Modele a relação N:N entre `usuarios` e `equipes` usando uma tabela de associação (por exemplo `associacao_usuario_equipe`) que contenha `usuario_id` e `equipe_id` como chaves estrangeiras.
+    - Migração: Gere e submeta a migração do Alembic (`alembic revision ...`) que cria as novas tabelas e relações.
 
-[![API docs](img/dashboard-items.png)](https://github.com/fastapi/full-stack-fastapi-template)
+- API (FastAPI):
+    - Utilize o padrão de Repositório e os Schemas (Pydantic) já existentes no módulo `usuarios`.
+    - CRUD de Equipes:
+        - `POST /equipes`: Cria uma nova equipe.
+        - `GET /equipes`: Lista todas as equipes.
+        - `DELETE /equipes/{equipe_id}`: Remove uma equipe.
 
-### Dashboard - User Settings
+    - Gestão de Membros (Lógica de Associação):
+        - `GET /equipes/{equipe_id}/membros`: Lista membros de uma equipe.
+        - `POST /equipes/{equipe_id}/membros`: Adiciona um usuário (enviando `usuario_id` no body) a uma equipe.
+        - `DELETE /equipes/{equipe_id}/membros/{usuario_id}`: Remove um usuário de uma equipe.
 
-[![API docs](img/dashboard-user-settings.png)](https://github.com/fastapi/full-stack-fastapi-template)
+B. Frontend (React & shadcn/ui)
 
-### Dashboard - Dark Mode
+- Navegação: Adicione um item na navegação de Admin que leve à página de gestão de equipes (por exemplo `TabsNav.tsx`).
 
-[![API docs](img/dashboard-dark.png)](https://github.com/fastapi/full-stack-fastapi-template)
+- Página `/admin/equipes`:
+    - Use uma `<Table>` (de `shadcn/ui`) para listar equipes (`GET /equipes`).
+    - Adicione um botão "Nova Equipe" que abra um `<Dialog>`/`<Modal>` para criar uma equipe (`POST /equipes`).
 
-### Interactive API Documentation
+- Página de Detalhe `/admin/equipes/{equipe_id}`:
+    - Mostrar o nome da equipe.
+    - Mostrar uma tabela de membros (`GET /equipes/{equipe_id}/membros`) com botão "Remover" por linha (`DELETE`).
+    - Fornecer um formulário para adicionar novo membro (sugestão: `Combobox` do `shadcn/ui` ou um `SingleSelectSearch` que consuma `GET /usuarios`).
 
-[![API docs](img/docs.png)](https://github.com/fastapi/full-stack-fastapi-template)
+C. Testes (Pytest)
 
-## How To Use It
+- Obrigatório: adicione testes no backend.
+- Foco: teste a lógica de associação. Exemplos que queremos ver:
+    - A listagem de membros de uma equipe.
+    - A falha ao tentar adicionar um usuário inexistente.
+    - A falha ou a idempotência ao tentar adicionar o mesmo usuário duas vezes.
 
-You can **just fork or clone** this repository and use it as is.
+4. Critérios de Avaliação (resumo)
 
-✨ It just works. ✨
+- Funcionalidade ponta a ponta.
+- Modelagem de dados e migrações corretas.
+- Aderência ao padrão de repositório e schemas.
+- Reuso de componentes `shadcn/ui`.
+- Qualidade e abrangência dos testes.
+- Código limpo e commits seguindo `padrao_commits.md`.
+- Uso consciente de IA (diferencial).
 
-### How to Use a Private Repository
+5. Entregáveis
 
-If you want to have a private repository, GitHub won't allow you to simply fork it as it doesn't allow changing the visibility of forks.
+- Um PR para `main` com as alterações.
+- Um arquivo `IA_LOG.md` descrevendo 3-5 interações com IA e a ação consciente tomada.
 
-But you can do the following:
-
-- Create a new GitHub repo, for example `my-full-stack`.
-- Clone this repository manually, set the name with the name of the project you want to use, for example `my-full-stack`:
-
-```bash
-git clone git@github.com:fastapi/full-stack-fastapi-template.git my-full-stack
-```
-
-- Enter into the new directory:
-
-```bash
-cd my-full-stack
-```
-
-- Set the new origin to your new repository, copy it from the GitHub interface, for example:
-
-```bash
-git remote set-url origin git@github.com:octocat/my-full-stack.git
-```
-
-- Add this repo as another "remote" to allow you to get updates later:
-
-```bash
-git remote add upstream git@github.com:fastapi/full-stack-fastapi-template.git
-```
-
-- Push the code to your new repository:
-
-```bash
-git push -u origin master
-```
-
-### Update From the Original Template
-
-After cloning the repository, and after doing changes, you might want to get the latest changes from this original template.
-
-- Make sure you added the original repository as a remote, you can check it with:
-
-```bash
-git remote -v
-
-origin    git@github.com:octocat/my-full-stack.git (fetch)
-origin    git@github.com:octocat/my-full-stack.git (push)
-upstream    git@github.com:fastapi/full-stack-fastapi-template.git (fetch)
-upstream    git@github.com:fastapi/full-stack-fastapi-template.git (push)
-```
-
-- Pull the latest changes without merging:
-
-```bash
-git pull --no-commit upstream master
-```
-
-This will download the latest changes from this template without committing them, that way you can check everything is right before committing.
-
-- If there are conflicts, solve them in your editor.
-
-- Once you are done, commit the changes:
-
-```bash
-git merge --continue
-```
-
-### Configure
-
-You can then update configs in the `.env` files to customize your configurations.
-
-Before deploying it, make sure you change at least the values for:
-
-- `SECRET_KEY`
-- `FIRST_SUPERUSER_PASSWORD`
-- `POSTGRES_PASSWORD`
-
-You can (and should) pass these as environment variables from secrets.
-
-Read the [deployment.md](./deployment.md) docs for more details.
-
-### Generate Secret Keys
-
-Some environment variables in the `.env` file have a default value of `changethis`.
-
-You have to change them with a secret key, to generate secret keys you can run the following command:
-
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(32))"
-```
-
-Copy the content and use that as password / secret key. And run that again to generate another secure key.
-
-## How To Use It - Alternative With Copier
-
-This repository also supports generating a new project using [Copier](https://copier.readthedocs.io).
-
-It will copy all the files, ask you configuration questions, and update the `.env` files with your answers.
-
-### Install Copier
-
-You can install Copier with:
-
-```bash
-pip install copier
-```
-
-Or better, if you have [`pipx`](https://pipx.pypa.io/), you can run it with:
-
-```bash
-pipx install copier
-```
-
-**Note**: If you have `pipx`, installing copier is optional, you could run it directly.
-
-### Generate a Project With Copier
-
-Decide a name for your new project's directory, you will use it below. For example, `my-awesome-project`.
-
-Go to the directory that will be the parent of your project, and run the command with your project's name:
-
-```bash
-copier copy https://github.com/fastapi/full-stack-fastapi-template my-awesome-project --trust
-```
-
-If you have `pipx` and you didn't install `copier`, you can run it directly:
-
-```bash
-pipx run copier copy https://github.com/fastapi/full-stack-fastapi-template my-awesome-project --trust
-```
-
-**Note** the `--trust` option is necessary to be able to execute a [post-creation script](https://github.com/fastapi/full-stack-fastapi-template/blob/master/.copier/update_dotenv.py) that updates your `.env` files.
-
-### Input Variables
-
-Copier will ask you for some data, you might want to have at hand before generating the project.
-
-But don't worry, you can just update any of that in the `.env` files afterwards.
-
-The input variables, with their default values (some auto generated) are:
-
-- `project_name`: (default: `"FastAPI Project"`) The name of the project, shown to API users (in .env).
-- `stack_name`: (default: `"fastapi-project"`) The name of the stack used for Docker Compose labels and project name (no spaces, no periods) (in .env).
-- `secret_key`: (default: `"changethis"`) The secret key for the project, used for security, stored in .env, you can generate one with the method above.
-- `first_superuser`: (default: `"admin@example.com"`) The email of the first superuser (in .env).
-- `first_superuser_password`: (default: `"changethis"`) The password of the first superuser (in .env).
-- `smtp_host`: (default: "") The SMTP server host to send emails, you can set it later in .env.
-- `smtp_user`: (default: "") The SMTP server user to send emails, you can set it later in .env.
-- `smtp_password`: (default: "") The SMTP server password to send emails, you can set it later in .env.
-- `emails_from_email`: (default: `"info@example.com"`) The email account to send emails from, you can set it later in .env.
-- `postgres_password`: (default: `"changethis"`) The password for the PostgreSQL database, stored in .env, you can generate one with the method above.
-- `sentry_dsn`: (default: "") The DSN for Sentry, if you are using it, you can set it later in .env.
-
-## Backend Development
-
-Backend docs: [backend/README.md](./backend/README.md).
+Boa sorte ao candidato! (mensagem registrada pelo recrutador)
 
 ## Frontend Development
 
@@ -228,7 +88,7 @@ Deployment docs: [deployment.md](./deployment.md).
 
 General development docs: [development.md](./development.md).
 
-This includes using Docker Compose, custom local domains, `.env` configurations, etc.
+Isso inclui o uso de Docker Compose, domínios locais configurados (localhost.tiangolo.com), variáveis em `.env` e outros pontos do fluxo de desenvolvimento.
 
 ## Release Notes
 
