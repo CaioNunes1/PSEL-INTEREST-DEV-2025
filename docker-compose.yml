@@ -1,123 +1,353 @@
+name: seletiva-interest-dev
 services:
-
+  adminer:
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+    environment:
+      ADMINER_DESIGN: pepa-linha-dark
+    image: adminer
+    networks:
+      sah_dev_net: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8080"
+        protocol: tcp
+    restart: "no"
+  backend:
+    build:
+      context: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+      dockerfile: Dockerfile
+    command:
+      - fastapi
+      - run
+      - --reload
+      - app/main.py
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
+      prestart:
+        condition: service_completed_successfully
+        required: true
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost
+      EMAILS_FROM_EMAIL: example@interest.com.br
+      EMAILS_FROM_NAME: example@interest.com.br
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: example@interest.com.br
+      FIRST_SUPERUSER_PASSWORD: changethis
+      FRONTEND_HOST: http://localhost:5173
+      HASHED_PASSWORD_TRAEFIK: $$2b$$12
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: e319bc888ef8711b3119709df75784c3f17b1e9dc8ff8da32832bbfec465b33e
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      PROJECT_NAME: seletiva-interest-dev
+      SCHEDULER_INTERVAL_MINUTES: "1"
+      SECRET_KEY: '@USERinterest2025'
+      SENTRY_DSN: ""
+      SMTP_HOST: mailcatcher
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "1025"
+      SMTP_SSL: "False"
+      SMTP_TLS: "false"
+      SMTP_USER: ""
+      STACK_NAME: seletiva-interest-dev
+    networks:
+      sah_dev_net: null
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+        target: /app
+        bind:
+          create_host_path: true
+      - type: volume
+        target: /app/.venv
+        volume: {}
   db:
-    image: postgres:17
-    restart: always
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: e319bc888ef8711b3119709df75784c3f17b1e9dc8ff8da32832bbfec465b33e
+      POSTGRES_USER: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test:
+        - CMD-SHELL
+        - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      timeout: 10s
       interval: 10s
       retries: 5
       start_period: 30s
-      timeout: 10s
+    image: postgres:17
+    networks:
+      sah_dev_net: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    restart: "no"
     volumes:
-      - app-db-data:/var/lib/postgresql/data/pgdata
-    env_file:
-      - .env
-    environment:
-      - PGDATA=/var/lib/postgresql/data/pgdata
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_DB=${POSTGRES_DB?Variable not set}
-
-  adminer:
-    image: adminer
-    restart: always
-    networks:
-      - default
+      - type: volume
+        source: app-db-data
+        target: /var/lib/postgresql/data/pgdata
+        volume: {}
+  dev-proxy:
     depends_on:
-      - db
-    environment:
-      - ADMINER_DESIGN=pepa-linha-dark
-    
-  prestart:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+      backend:
+        condition: service_started
+        required: true
+      scheduler:
+        condition: service_started
+        required: true
+      sse:
+        condition: service_started
+        required: true
+    image: nginx:stable
+    networks:
+      sah_dev_net: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "8000"
+        protocol: tcp
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /home/jpamm/Seletiva-Interest-Dev-2025/frontend/nginx.dev.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind:
+          create_host_path: true
+  frontend:
     build:
-      context: ./backend
-    networks:
-      - default
+      context: /home/jpamm/Seletiva-Interest-Dev-2025/frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: development
+        VITE_API_BASE: http://localhost:8000
     depends_on:
-      db:
-        condition: service_healthy
-        restart: true
-    command: bash scripts/prestart.sh
-    env_file:
-      - .env
+      dev-proxy:
+        condition: service_started
+        required: true
     environment:
-      - DOMAIN=${DOMAIN}
-      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
-      - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
-      - POSTGRES_SERVER=db
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - SENTRY_DSN=${SENTRY_DSN}
-
-  backend:
-    image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
-    restart: always
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost
+      EMAILS_FROM_EMAIL: example@interest.com.br
+      EMAILS_FROM_NAME: example@interest.com.br
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: example@interest.com.br
+      FIRST_SUPERUSER_PASSWORD: changethis
+      FRONTEND_HOST: http://localhost:5173
+      HASHED_PASSWORD_TRAEFIK: $$2b$$12
+      NODE_ENV: development
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: e319bc888ef8711b3119709df75784c3f17b1e9dc8ff8da32832bbfec465b33e
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      PROJECT_NAME: seletiva-interest-dev
+      SCHEDULER_INTERVAL_MINUTES: "1"
+      SECRET_KEY: '@USERinterest2025'
+      SENTRY_DSN: ""
+      SMTP_HOST: ""
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "587"
+      SMTP_SSL: "False"
+      SMTP_TLS: "True"
+      SMTP_USER: ""
+      STACK_NAME: seletiva-interest-dev
+      VITE_API_BASE: http://localhost:8000
     networks:
-      - default
+      sah_dev_net: null
+    ports:
+      - mode: ingress
+        target: 5173
+        published: "5173"
+        protocol: tcp
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /home/jpamm/Seletiva-Interest-Dev-2025/frontend
+        target: /app
+        bind:
+          create_host_path: true
+      - type: volume
+        target: /app/node_modules
+        volume: {}
+  mailcatcher:
+    image: schickling/mailcatcher
+    networks:
+      sah_dev_net: null
+    ports:
+      - mode: ingress
+        target: 1080
+        published: "1080"
+        protocol: tcp
+      - mode: ingress
+        target: 1025
+        published: "1025"
+        protocol: tcp
+    restart: "no"
+  prestart:
+    build:
+      context: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+      dockerfile: Dockerfile
+    command:
+      - bash
+      - scripts/prestart.sh
     depends_on:
       db:
         condition: service_healthy
-        restart: true
+        required: true
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com
+      DOMAIN: localhost
+      EMAILS_FROM_EMAIL: example@interest.com.br
+      EMAILS_FROM_NAME: example@interest.com.br
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: example@interest.com.br
+      FIRST_SUPERUSER_PASSWORD: changethis
+      FRONTEND_HOST: http://localhost:5173
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: e319bc888ef8711b3119709df75784c3f17b1e9dc8ff8da32832bbfec465b33e
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      PROJECT_NAME: seletiva-interest-dev
+      SECRET_KEY: '@USERinterest2025'
+      SENTRY_DSN: ""
+      SMTP_HOST: ""
+      SMTP_PASSWORD: ""
+      SMTP_USER: ""
+    networks:
+      sah_dev_net: null
+  scheduler:
+    build:
+      context: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+      dockerfile: Dockerfile
+    command:
+      - fastapi
+      - run
+      - --reload
+      - app/main_scheduler.py
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
       prestart:
         condition: service_completed_successfully
-    env_file:
-      - .env
+        required: true
     environment:
-      - DOMAIN=${DOMAIN}
-      - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
-      - ENVIRONMENT=${ENVIRONMENT}
-      - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
-      - SECRET_KEY=${SECRET_KEY?Variable not set}
-      - FIRST_SUPERUSER=${FIRST_SUPERUSER?Variable not set}
-      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD?Variable not set}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - EMAILS_FROM_EMAIL=${EMAILS_FROM_EMAIL}
-      - POSTGRES_SERVER=db
-      - POSTGRES_PORT=${POSTGRES_PORT}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER?Variable not set}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - SENTRY_DSN=${SENTRY_DSN}
-
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-    build:
-      context: ./backend
-
-  frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
-    restart: always
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost
+      EMAILS_FROM_EMAIL: example@interest.com.br
+      EMAILS_FROM_NAME: example@interest.com.br
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: example@interest.com.br
+      FIRST_SUPERUSER_PASSWORD: changethis
+      FRONTEND_HOST: http://localhost:5173
+      HASHED_PASSWORD_TRAEFIK: $$2b$$12
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: e319bc888ef8711b3119709df75784c3f17b1e9dc8ff8da32832bbfec465b33e
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      PROJECT_NAME: seletiva-interest-dev
+      SCHEDULER_INTERVAL_MINUTES: "1"
+      SECRET_KEY: '@USERinterest2025'
+      SENTRY_DSN: ""
+      SMTP_HOST: mailcatcher
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "1025"
+      SMTP_SSL: "False"
+      SMTP_TLS: "false"
+      SMTP_USER: ""
+      STACK_NAME: seletiva-interest-dev
     networks:
-      - traefik-public
-      - default
+      sah_dev_net: null
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+        target: /app
+        bind:
+          create_host_path: true
+      - type: volume
+        target: /app/.venv
+        volume: {}
+  sse:
     build:
-      context: ./frontend
-      args:
-        - VITE_API_URL=https://api.${DOMAIN?Variable not set}
-        - NODE_ENV=development
-    
+      context: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+      dockerfile: Dockerfile
+    command:
+      - fastapi
+      - run
+      - --reload
+      - app/main_sse.py
+    depends_on:
+      db:
+        condition: service_healthy
+        required: true
+      prestart:
+        condition: service_completed_successfully
+        required: true
+    environment:
+      BACKEND_CORS_ORIGINS: http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com
+      DOCKER_IMAGE_BACKEND: backend
+      DOCKER_IMAGE_FRONTEND: frontend
+      DOMAIN: localhost
+      EMAILS_FROM_EMAIL: example@interest.com.br
+      EMAILS_FROM_NAME: example@interest.com.br
+      ENVIRONMENT: local
+      FIRST_SUPERUSER: example@interest.com.br
+      FIRST_SUPERUSER_PASSWORD: changethis
+      FRONTEND_HOST: http://localhost:5173
+      HASHED_PASSWORD_TRAEFIK: $$2b$$12
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD: e319bc888ef8711b3119709df75784c3f17b1e9dc8ff8da32832bbfec465b33e
+      POSTGRES_PORT: "5432"
+      POSTGRES_SERVER: db
+      POSTGRES_USER: postgres
+      PROJECT_NAME: seletiva-interest-dev
+      SCHEDULER_INTERVAL_MINUTES: "1"
+      SECRET_KEY: '@USERinterest2025'
+      SENTRY_DSN: ""
+      SMTP_HOST: ""
+      SMTP_PASSWORD: ""
+      SMTP_PORT: "587"
+      SMTP_SSL: "False"
+      SMTP_TLS: "True"
+      SMTP_USER: ""
+      STACK_NAME: seletiva-interest-dev
+    networks:
+      sah_dev_net: null
+    restart: "no"
+    volumes:
+      - type: bind
+        source: /home/jpamm/Seletiva-Interest-Dev-2025/backend
+        target: /app
+        bind:
+          create_host_path: true
+      - type: volume
+        target: /app/.venv
+        volume: {}
+networks:
+  sah_dev_net:
+    name: Seletiva-Interest-Dev-2025_sah_dev_net
+    driver: bridge
 volumes:
   app-db-data:
-
-networks:
-  traefik-public:
-    # Allow setting it to false for testing
-    external: true
+    name: Seletiva-Interest-Dev-2025_app-db-data
