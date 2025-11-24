@@ -42,7 +42,7 @@ export const quests: Quest[] = [
     icon: '🎨',
     level: 'Nível 3',
     xp: '+350 XP',
-    difficulty: 'Médio'
+    difficulty: 'Desafiador'
   },
   {
     id: 'tests',

@@ -125,6 +125,7 @@ Estas perguntas guiam a correção do desafio e ajudam a garantir que todos os r
 3.  Arquivo **`IA_LOG.md`** na raiz do projeto contendo:
     - Breve descrição dos prompts utilizados.
     - **Item Obrigatório:** Cite pelo menos um exemplo onde a IA sugeriu código incorreto, inseguro ou que violava uma regra de negócio, e descreva como você identificou e corrigiu o problema. Queremos avaliar seu senso crítico.
+4.  Arquivo **`DESCRIPTION_LOG.md`** o qual vai narrar seu processo criativo, com base em quais etapas você escolheu seguir, em qual ordem e o porquê de grandes decisões arquiteturais, ou decisões que você julga relevantes para o conhecimento do avaliador. Esse passo à passo pode ser bem objetivo, é mais para mapear o que de fato foi feito e direcionar a correção do avaliador.
 
 ## Development & License
 Consulte `development.md` para instruções de setup local.
