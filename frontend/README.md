@@ -46,7 +46,6 @@ A estrutura de pastas foi organizada para facilitar a escalabilidade e manutenç
 
 ## 🧩 Funcionalidades Principais
 
-- **Sistema de Quests**: Visualização de cards de desafios com barra de progresso.
 - **Navegação**: Roteamento entre a listagem de quests e os detalhes de cada desafio.
 - **Gerenciamento de Estado**: Persistência do progresso do usuário utilizando Context API e LocalStorage.
 - **Design Responsivo**: Interface adaptável para diferentes tamanhos de tela com animações fluidas.
