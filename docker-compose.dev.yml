@@ -1,0 +1,58 @@
+# Development environment overrides
+services:
+  db:
+    restart: "no"
+    ports:
+      - "5432:5432"
+
+  adminer:
+    restart: "no"
+    ports:
+      - "8080:8080"
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    restart: "no"
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  prestart:
+    # Ensure prestart runs on the same network so it can reach the DB by hostname
+
+  backend:
+    restart: "no"
+    ports:
+      - "8000:8000"
+    command:
+      - fastapi
+      - run
+      - --reload
+      - "app/main.py"
+    volumes:
+      - ./backend:/app
+      - /app/.venv  # Prevent host .venv from overwriting container's
+    env_file:
+      - .env
+    environment:
+      # Override SMTP for mailcatcher in dev
+      - SMTP_HOST=mailcatcher
+      - SMTP_PORT=1025
+      - SMTP_TLS=false
+      # Override database connection to use container name
+      - POSTGRES_SERVER=db
+
+  frontend:
+    restart: "no"
+    ports:
+      - "5173:5173"
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE=http://localhost:8000

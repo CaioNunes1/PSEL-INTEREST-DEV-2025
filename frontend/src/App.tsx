@@ -1,0 +1,23 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { QuestProvider } from './context/QuestContext'
+import MainLayout from './layouts/MainLayout'
+import LandingPage from './pages/LandingPage'
+import QuestPage from './pages/QuestPage'
+import './App.css'
+
+function App() {
+  return (
+    <QuestProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<LandingPage />} />
+            <Route path="quest/:id" element={<QuestPage />} />
+          </Route>
+        </Routes>
+      </Router>
+    </QuestProvider>
+  )
+}
+
+export default App
