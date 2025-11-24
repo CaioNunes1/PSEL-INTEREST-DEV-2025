@@ -80,15 +80,6 @@ backend-shell: ## Open backend shell (dev)
 backend-logs: ## Show backend logs (dev)
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f backend
 
-backend-test: ## Run backend tests (dev)
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend bash scripts/test.sh
-
-backend-format: ## Format backend code (dev)
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend bash scripts/format.sh
-
-backend-lint: ## Lint backend code (dev)
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend bash scripts/lint.sh
-
 # Frontend specific commands
 frontend-shell: ## Open frontend shell (dev)
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend sh
