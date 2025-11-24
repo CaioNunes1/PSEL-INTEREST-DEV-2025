@@ -1,6 +1,6 @@
 import React from 'react'
 import { Quest, questContent } from '../data/questsData'
-import { useQuest } from '../context/QuestContext'
+import { useQuest } from '../hooks/useQuestContext'
 
 interface QuestCardProps {
   quest: Quest

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { QuestProvider } from './context/QuestContext'
+import { QuestProvider } from './hooks/useQuestContext'
 import MainLayout from './layouts/MainLayout'
 import LandingPage from './pages/LandingPage'
 import QuestPage from './pages/QuestPage'
