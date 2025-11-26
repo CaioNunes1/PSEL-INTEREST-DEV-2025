@@ -3,7 +3,7 @@
 ## Visão Geral
 Deverá ser demonstrada a habilidade de projetar e integrar uma nova funcionalidade em uma base de código existente. Você terá **1 semana** para completar o desafio.
 
-**Nota importante:** O candidato parte do zero no que diz respeito ao novo módulo — **não existe schema, rota ou página de frontend pré-criada** para o módulo de Equipes. Espera-se que o participante projete a arquitetura (back-end e front-end), os modelos de dados e as rotas necessárias. Também é fornecida uma arquitetura base, mas pode montar uma nova, isso será levado em consideração, desde que seja bem fundamentado.
+**Nota importante:** O candidato parte do zero no que diz respeito ao novo módulo — **não existe schema, rota ou página de frontend pré-criada** para o módulo de Equipes. Espera-se que o participante projete a arquitetura (back-end e front-end), os modelos de dados e as rotas necessárias, mas tem-se uma base para servir de guia na organização incial do projeto, que inclusive é a mesma página da demo que serve de base para guiar o desafio.
 
 ---
 
