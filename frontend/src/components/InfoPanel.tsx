@@ -14,17 +14,17 @@ const InfoPanel: React.FC = () => {
           <li>Envie seu código</li>
         </ol>
       </div>
-      
+
       <div className="info-card">
         <h3>⚖️ Critérios de Avaliação</h3>
         <ul>
-          <li>✅ Funcionalidade completa</li>
-          <li>🏛️ Arquitetura e padrões</li>
-          <li>🧪 Cobertura de testes</li>
-          <li>📝 Qualidade do código</li>
-          <li>🎨 UI/UX (frontend)</li>
-          <li>🤖 Uso consciente de IA</li>
+          <li>🗄️ Banco de Dados (Integridade)</li>
+          <li>⚙️ Backend (Robustez)</li>
+          <li>🖥️ Frontend (UX & Estado)</li>
+          <li>🧪 QA (Testes Automatizados)</li>
+          <li>⭐ Bônus (Processo & Docs)</li>
         </ul>
+        <p>⚠️ Importante: Os critérios técnicos detalhados e as perguntas de autoavaliação estão no arquivo README.md do repositório.</p>
       </div>
     </div>
   )
