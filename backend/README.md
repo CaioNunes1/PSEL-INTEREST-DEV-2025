@@ -37,34 +37,46 @@ make dev-up
 - **Docs (Swagger)**: `http://localhost:8000/docs`
 - **Redoc**: `http://localhost:8000/redoc`
 
-### 2. Criando Novos Modelos (Tabelas)
-1. Abra `app/models.py`.
-2. Crie uma classe herdando de `SQLModel` com `table=True`.
-3. Defina os campos e relacionamentos.
-4. **Importante**: Após criar ou modificar um modelo, você deve gerar uma migração.
-
-### 3. Gerenciando o Banco de Dados (Migrações)
+### 2. Gerenciando o Banco de Dados (Migrações)
 O Alembic gerencia as mudanças no esquema do banco.
 
 **Gerar uma nova migração (após editar models.py):**
 ```bash
 # Execute na raiz do projeto (com o docker rodando)
+# Usando o Makefile (recomendado):
+make db-new-migration MESSAGE="Descrição da mudança"
+
+# Alternativa direta (docker compose):
 docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic revision --autogenerate -m "Descrição da mudança"
 ```
 
 **Aplicar as migrações (atualizar o banco):**
 ```bash
+# Usando o Makefile (recomendado):
+# Aplicar até a versão mais recente
+make db-upgrade
+
+# Aplicar até uma revisão específica
+make db-upgrade REVISION=<rev>
+
+# Aplicar um passo relativo (ex.: subir 1 revisão)
+make db-upgrade STEP=1
+
+# Alternativa direta (docker compose):
 docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic upgrade head
 ```
 
-### 4. Criando Novas Rotas
-1. Crie um novo arquivo em `app/api/routes/` (ex: `teams.py`).
-2. Defina o `APIRouter` e seus endpoints.
-3. Vá em `app/api/main.py` e registre o novo router:
-   ```python
-   from app.api.routes import teams
-   api_router.include_router(teams.router, prefix="/teams", tags=["teams"])
-   ```
+**Reverter migrações:**
+```bash
+# Reverter até uma revisão específica
+make db-downgrade REVISION=<rev>
+
+# Reverter por passos (ex.: descer 1 revisão)
+make db-downgrade STEP=1
+
+# Alternativa direta (docker compose):
+docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic downgrade -1
+```
 
 ## 📝 Comandos Úteis (Makefile)
 
@@ -74,9 +86,6 @@ Para facilitar, use os comandos do Makefile na raiz do projeto:
 |------|---------|-----------|
 | **Shell no Backend** | `make backend-shell` | Abre um terminal dentro do container do backend. |
 | **Logs** | `make backend-logs` | Vê os logs da aplicação em tempo real. |
-| **Testes** | `make backend-test` | Roda os testes automatizados (Pytest). |
-| **Formatar** | `make backend-format` | Formata o código com Ruff e Black. |
-| **Lint** | `make backend-lint` | Verifica erros de estilo e tipagem. |
 
 ---
 *Dica: Mantenha o código sempre tipado (Type Hints) para aproveitar o máximo do FastAPI e Pydantic.*

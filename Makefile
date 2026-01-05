@@ -77,6 +77,31 @@ frontend-logs: ## Show frontend logs (dev)
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f frontend
 
 # Database commands
+db-new-migration: ## Create a new Alembic migration (usage: make db-new-migration MESSAGE="desc")
+	@if [ -z "$(MESSAGE)" ]; then \
+		echo "$(RED)Error: MESSAGE parameter is required$(NC)"; \
+		echo "Usage: make db-new-migration MESSAGE=\"Descrição da mudança\""; \
+		exit 1; \
+	fi
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic revision --autogenerate -m "$(MESSAGE)"
+
+db-upgrade: ## Apply Alembic migrations (dev) (usage: make db-upgrade [REVISION=<rev>] [STEP=<n>])
+	@bash -c 'if [ -n """$(REVISION)""" ]; then \
+		docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic upgrade """$(REVISION)"""; \
+	elif [ -n """$(STEP)""" ]; then \
+		docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic upgrade +"""$(STEP)"""; \
+	else \
+		docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic upgrade head; \
+	fi'
+
+db-downgrade: ## Downgrade Alembic migrations (usage: make db-downgrade REVISION=<rev> | STEP=<n>)
+	@bash -c 'if [ -z """$(REVISION)""" ] && [ -z """$(STEP)""" ]; then echo "$(RED)Error: REVISION or STEP required$(NC)"; exit 1; fi; '
+	@bash -c 'if [ -n """$(STEP)""" ]; then \ 
+		docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic downgrade -"""$(STEP)"""; \
+	else \ 
+		docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend alembic downgrade """$(REVISION)"""; \ 
+	fi'
+
 db-shell: ## Open database shell (dev)
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec db psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-app}
 
