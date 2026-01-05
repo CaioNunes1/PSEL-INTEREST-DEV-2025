@@ -38,11 +38,10 @@ Certifique-se de ter o **Node.js** instalado.
 A estrutura de pastas foi organizada para facilitar a escalabilidade e manutenção:
 
 - **`src/components`**: Componentes de UI reutilizáveis (ex: `QuestCard`, `Header`, `InfoPanel`).
-- **`src/pages`**: Componentes que representam páginas completas (ex: `LandingPage`, `QuestPage`).
-- **`src/layouts`**: Estruturas de layout que envolvem as páginas (ex: `MainLayout`).
-- **`src/hooks`**: Hooks customizados e Context API (ex: `useQuestContext` para gerenciar o progresso das quests).
 - **`src/data`**: Arquivos de dados estáticos ou configurações (ex: `questsData.ts`).
-- **`src/routes`**: (Se houver) Definições de rotas adicionais.
+- **`src/hooks`**: Hooks customizados e Context API (ex: `useQuestContext` para gerenciar o progresso das quests).
+- **`src/layouts`**: Estruturas de layout que envolvem as páginas (ex: `MainLayout`).
+- **`src/pages`**: Componentes que representam páginas completas (ex: `LandingPage`, `QuestPage`).
 
 ## 🧩 Funcionalidades Principais
 
