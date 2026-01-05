@@ -4,23 +4,19 @@
 
 ## Iniciar o Ambiente de Desenvolvimento
 
-- Inicie a stack local com o Makefile:
+Inicie a stack local com o Makefile:
 
 ```bash
 make dev-up
 ```
 
-- Em seguida, abra o navegador e acesse as URLs abaixo:
+Em seguida, abra o navegador e acesse as URLs abaixo:
 
-**Frontend** (servido com Docker, hot-reload): http://localhost:5173
+- **Frontend** (servido com Docker, hot-reload): http://localhost:5173
 
-**Backend** (API JSON via OpenAPI): http://localhost:8000
+- **Documentação interativa** (Swagger UI): http://localhost:8000/docs
 
-**Documentação interativa** (Swagger UI): http://localhost:8000/docs
-
-**Adminer** (administração do banco): http://localhost:8080
-
-**MailCatcher** (emails de desenvolvimento): http://localhost:1080
+- **Adminer** (administração do banco): http://localhost:8080
 
 **Observação**: Na primeira vez que iniciar a stack pode demorar alguns instantes para ficar pronta — o backend aguarda o banco e executa configurações iniciais. Consulte os logs para acompanhar o progresso.
 
@@ -63,9 +59,6 @@ make help
 |---------|-----------|
 | `make backend-shell` | Abre shell no container do backend |
 | `make backend-logs` | Mostra logs do backend |
-| `make backend-test` | Executa testes do backend |
-| `make backend-format` | Formata código do backend |
-| `make backend-lint` | Executa linter no backend |
 
 ### Comandos específicos do Frontend:
 
@@ -78,9 +71,9 @@ make help
 
 | Comando | Descrição |
 |---------|-----------|
-| `make dev-db-shell` | Abre shell PostgreSQL |
-| `make dev-db-backup` | Cria backup do banco |
-| `make dev-db-restore FILE=arquivo.dump` | Restaura backup |
+| `make db-shell` | Abre shell PostgreSQL |
+| `make db-backup` | Cria backup do banco |
+| `make db-restore FILE=arquivo.dump` | Restaura backup |
 
 ## Desenvolvimento Local Híbrido
 
@@ -114,8 +107,6 @@ O projeto usa múltiplos arquivos Docker Compose organizados por ambiente:
 
 - **`docker-compose.yml`** - Configuração base compartilhada
 - **`docker-compose.dev.yml`** - Overrides para desenvolvimento (volumes, hot-reload, portas expostas)
-- **`docker-compose.traefik.yml`** - Configuração do Traefik para staging/produção
-- **`docker-compose.staging.yml`** - Overrides para staging local
 
 O Makefile combina automaticamente os arquivos corretos para cada ambiente.
 
@@ -136,8 +127,7 @@ make dev-restart
 Para visualizar a configuração final do Docker Compose (com todos os overrides aplicados):
 
 ```bash
-make config-dev      # Configuração de desenvolvimento
-make config-staging  # Configuração de staging
+make config      # Configuração de desenvolvimento
 ```
 
 ## Limpeza e Manutenção
@@ -157,16 +147,6 @@ make prune
 make dev-build
 ```
 
-## Gerar Cliente OpenAPI
-
-Para regenerar o cliente TypeScript do frontend baseado na API do backend:
-
-```bash
-make generate-client
-```
-
-**Nota**: O backend deve estar rodando antes de executar este comando.
-
 
 ## URLs de Desenvolvimento
 
@@ -179,7 +159,6 @@ Após executar `make dev-up`, os seguintes serviços estarão disponíveis:
 | **Swagger UI** | http://localhost:8000/docs | Documentação interativa da API |
 | **ReDoc** | http://localhost:8000/redoc | Documentação alternativa da API |
 | **Adminer** | http://localhost:8080 | Interface web para PostgreSQL |
-| **MailCatcher** | http://localhost:1080 | Captura de emails de desenvolvimento |
 | **PostgreSQL** | localhost:5432 | Banco de dados (acesso direto) |
 
 ## Fluxo de Trabalho Recomendado
@@ -188,9 +167,7 @@ Após executar `make dev-up`, os seguintes serviços estarão disponíveis:
 2. **Verificar status**: `make dev-ps`
 3. **Acompanhar logs**: `make dev-logs` (Ctrl+C para sair)
 4. **Desenvolver**: Edite os arquivos (hot-reload ativo)
-5. **Testar backend**: `make backend-test`
-6. **Formatar código**: `make backend-format`
-7. **Ao terminar**: `make dev-down`
+5. **Ao terminar**: `make dev-down`
 
 ## Troubleshooting
 

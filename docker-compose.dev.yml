@@ -10,13 +10,6 @@ services:
     ports:
       - "8080:8080"
 
-  mailcatcher:
-    image: schickling/mailcatcher
-    restart: "no"
-    ports:
-      - "1080:1080"
-      - "1025:1025"
-
   prestart:
     # Ensure prestart runs on the same network so it can reach the DB by hostname
 
