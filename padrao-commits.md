@@ -1,5 +1,7 @@
 # Padrões de commits 📜
 
+> ℹ️ **Créditos:** Este guia foi adaptado das diretrizes do repositório [padroes-de-commit](https://github.com/iuricode/padroes-de-commits). Todos os créditos aos autores originais.
+
 De acordo com a documentação do **[Conventional Commits](https://www.conventionalcommits.org/pt-br)**, commits semânticos são uma convenção simples para ser utilizada nas mensagens de commit. Essa convenção define um conjunto de regras para criar um histórico de commit explícito, o que facilita a criação de ferramentas automatizadas.
 
 Esses commits auxiliarão você e sua equipe a entenderem de forma facilitada quais alterações foram realizadas no trecho de código que foi commitado.
@@ -36,82 +38,10 @@ O commit semântico possui os elementos estruturais abaixo (tipos), que informam
 
 - `remove` - Commits do tipo remove indicam a exclusão de arquivos, diretórios ou funcionalidades obsoletas ou não utilizadas, reduzindo o tamanho e a complexidade do projeto e mantendo-o mais organizado.
 
-## 🛠️ Como instalar o arquivo `commit-msg.sh` para validar mensagens de commits com conventional commits
-
-### Passo 1: Certifique-se de que o Git está instalado 🌟
-
-Antes de tudo, verifique se o Git está instalado na sua máquina. Abra o terminal e execute:
-
-```bash
-git --version
-```
-
-Se você receber uma versão do Git como resposta, está tudo certo! Caso contrário, baixe e instale o Git aqui: [Git Downloads](https://git-scm.com/downloads).
-
-### Passo 2: Localize o arquivo `commit-msg.sh` 📂
-
-O arquivo `commit-msg.sh` deve estar disponível no repositório do seu projeto ou em um diretório específico. Certifique-se de que ele está acessível. Se não estiver, faça o download ou clone o repositório onde ele está localizado.
-
-Por exemplo:
-
-```bash
-git clone https://github.com/seu-repositorio/projeto.git
-cd projeto
-```
-
-### Passo 3: Crie o diretório `.git/hooks` (se ainda não existir) 📁
-
-Os hooks do Git ficam no diretório `.git/hooks`. Verifique se ele existe no seu projeto:
-
-```bash
-ls -la .git/hooks
-```
-
-Se o diretório não existir, crie-o:
-
-```bash
-mkdir -p .git/hooks
-```
-
-### Passo 4: Copie o arquivo `commit-msg.sh` para o diretório `.git/hooks` 📋
-
-Copie o arquivo `commit-msg.sh` para o diretório `.git/hooks` e renomeie-o para `commit-msg` (sem extensão):
-
-```bash
-cp caminho/para/commit-msg.sh .git/hooks/commit-msg
-```
-
-> **Nota:** Substitua `caminho/para/commit-msg.sh` pelo caminho real do arquivo.
-
-### Passo 5: Dê permissão de execução ao script ✅
-
-Para que o Git possa executar o script, você precisa dar permissão de execução:
-
-```bash
-chmod +x .git/hooks/commit-msg
-```
-
-### Passo 6: Teste o hook de commit 💻
-
-Agora, tente fazer um commit no seu projeto. Por exemplo:
-
-```bash
-git add .
-git commit -m "feat: adicionar funcionalidade xyz"
-```
-
-Se a mensagem de commit seguir o padrão **Conventional Commits**, o commit será aceito. Caso contrário, o hook irá bloquear o commit e exibir uma mensagem de erro.
-
-### Passo 7: Personalize o script (opcional) 🎨
-
-Se necessário, abra o arquivo `.git/hooks/commit-msg` em um editor de texto e personalize as regras de validação para atender às necessidades do seu projeto.
-
 ## Recomendações 🎉
 
 - Adicione um tipo consistente com o título do conteúdo.
-- Recomendamos que na primeira linha deve ter no máximo 4 palavras.
 - Para descrever com detalhes, usar a descrição do commit.
-- Usar um emoji no início da mensagem de commit representando sobre o commit.
 - Os links precisam ser adicionados em sua forma mais autêntica, ou seja: sem encurtadores de link e links afiliados.
 
 ## Complementos de commits 💻
@@ -454,15 +384,3 @@ Se necessário, abra o arquivo `.git/hooks/commit-msg` em um editor de texto e p
 - `pull request` - Mecanismo usado para submeter alterações propostas ao repositório original. Um pull request é uma solicitação para que os mantenedores do projeto revisem e potencialmente incorporem as alterações. O pull request passará por um processo de avaliação e pode ser aceito ou rejeitado.
 
 - `gist` - Ferramenta que permite o compartilhamento de trechos de código sem a necessidade de criar um repositório completo. Gists podem ser compartilhados publicamente ou de forma privada.
-
-# Contribuição ✨
-
-Ajude a comunidade tornando este projeto ainda mais incrível. Leia como contribuir clicando **[aqui](https://github.com/iuricode/padroes-de-commits/blob/main/CONTRIBUTING.md)** e a **[licença](https://github.com/iuricode/padroes-de-commits/blob/main/LICENSE.md)**. Estou convencido de que juntos alcançaremos coisas incríveis!
-
-## Disponível para freelas - #OpenToWork 🚀
-
-Atualmente estou aberto para oportunidades como Desenvolvedor Frontend e UI/UX Designer. Se você precisa de alguém para transformar ideias em interfaces bonitas, responsivas e funcionais, podemos trabalhar juntos!
-
-📬 Entre em contato:
-📧 iuricold99@gmail.com
-💼 [Linkedin](https://www.linkedin.com/in/iuricode/)
