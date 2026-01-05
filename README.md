@@ -5,8 +5,6 @@ Deverá ser demonstrada a habilidade de projetar e integrar uma nova funcionalid
 
 **Nota importante:** O candidato parte do zero no que diz respeito ao novo módulo — **não existe schema, rota ou página de frontend pré-criada** para o módulo de Equipes. Espera-se que o participante projete a arquitetura (back-end e front-end), os modelos de dados e as rotas necessárias, mas tem-se uma base para servir de guia na organização incial do projeto, que inclusive é a mesma página da demo que serve de base para guiar o desafio.
 
----
-
 ## 1. O Projeto Base
 O stack tecnológico do projeto é:
 - **Backend:** FastAPI com padrão de repositório e autenticação implementada.
@@ -14,12 +12,8 @@ O stack tecnológico do projeto é:
 - **Frontend:** React (Vite) com TypeScript.
 - **Testes:** Estrutura de Pytest configurada para o backend.
 
----
-
 ## 2. O Desafio: "Módulo de Gestão de Equipes"
 O objetivo é criar um sistema onde seja possível gerenciar **Equipes** e seus respectivos **Membros** (Usuários). Você deverá criar as tabelas, a API e as interfaces gráficas seguindo os padrões do projeto.
-
----
 
 ## 3. Requisitos Funcionais (O Quê)
 
@@ -64,68 +58,75 @@ Ps: é recomendado o uso da ferramenta Lovable ou Figma AI para a criação da v
 - **Frontend (Opcional/Diferencial):**
     - Testes E2E ou unitários de componentes são bem-vindos, mas não eliminatórios.
 
----
+## 4. Entregáveis
 
-## 4. Critérios de Avaliação
+1.  **Link do Repositório (Fork):** O projeto deve ser entregue através de um Fork do repositório original. Certifique-se de que o repositório esteja público ou acessível para correção.
+2.  **Código Fonte Completo:** A implementação funcional de todas as camadas (Banco, Backend, Frontend e Testes).
+3. **Documentação de Processo (Itens Diferenciais / Bônus):** Embora o foco da avaliação seja a solução técnica, os arquivos abaixo contam como pontuação extra para avaliar seu pensamento crítico e organização:
+    - **Arquivo ``IA_LOG.md``:** Registre brevemente os prompts utilizados. **Obrigatório para o bônus:** Cite um exemplo onde a IA sugeriu código incorreto, inseguro ou ruim, e descreva como você identificou e corrigiu o problema.
+    - **Arquivo ``DESCRIPTION_LOG.md``:** Um "diário de bordo" objetivo narrando seu processo criativo: por onde começou, qual ordem seguiu e a justificativa para grandes decisões arquiteturais. Isso ajuda o avaliador a entender seu raciocínio.
+
+## 5. Critérios de Avaliação
 
 Estas perguntas guiam a correção do desafio e ajudam a garantir que todos os requisitos foram atendidos:
 
-**1. Modelagem de Dados & Banco (Postgres)**
-- **Integridade dos Relacionamentos:**
-    - A modelagem reflete corretamente as entidades (Equipes e Usuários) e seus relacionamentos de participação e liderança?
+**1. Modelagem de Dados & Integridade**
+
+Neste tópico, avaliaremos se a sua solução de banco de dados é robusta e se comporta como uma camada confiável de persistência.
+
+- **Estrutura e Relacionamentos:**
+    - A modelagem das tabelas representa corretamente as entidades do sistema e estabelece os vínculos necessários entre membros e suas equipes?
 - **Garantia das Regras de Negócio:**
-    - **Participação na Equipe:** A regra de que "1 Usuário só pode pertencer a 1 Equipe" está garantida de forma que seja impossível violá-la no banco de dados, independentemente do código da aplicação? (A preferência é por garantia no banco).
-    - **Liderança:** A regra de que "1 Usuário só pode ser líder de 1 Equipe" está garantida?
-- **Requisito de Líder:**
-    - O design garante que não é possível criar uma equipe sem um Líder associado?
-- **Migrações:**
-    - As migrações do Alembic foram geradas corretamente, são reversíveis (contêm o passo de downgrade) e não causam perda de dados?
-- **Performance:**
-    - O design de dados permite consultas rápidas (listagem de todos os membros de uma equipe, busca por líder) sem a necessidade de varrer tabelas inteiras (como vai ser feita a paginação desses dados)?
+     - A estrutura do banco de dados foi desenhada para impedir nativamente inconsistências?
+     - A modelagem garante, por si só, que regras críticas (como exclusividade de liderança e unicidade de participação) sejam respeitadas, impossibilitando estados inválidos mesmo sem a validação da aplicação?
+- **Gestão de Schema (Migrações):**
+    - O projeto utiliza um sistema de migrações confiável?
+    - As alterações no banco são rastreáveis e reversíveis, permitindo que o ambiente seja atualizado ou revertido (downgrade) sem corromper a integridade dos dados ou da estrutura?
 
-**2. Backend (FastAPI & Arquitetura)**
-- **API:**
-    - Os endpoints seguem boas práticas REST (verbos corretos, status codes 201/200/404/400/422)?
-    - A API trata erros de forma graciosa? (Ex: tentar adicionar membro que já tem equipe retorna um erro claro 400/409 e não um 500 genérico).
-- **Código:**
-    - O padrão de Repositório foi respeitado? A lógica de banco está isolada das rotas?
-    - Os Schemas (Pydantic) validam corretamente as entradas e saídas?
-    - O código está limpo, organizado e tipado (Type Hints)?
+**2. API REST, Regras de Negócio & Arquitetura**
 
-**3. Frontend (React & UX)**
-- **Funcionalidade:**
-    - É possível realizar todo o fluxo (Criar Usuário -> Adicionar Usuários -> Remover Usuários) sem erros?
-    - É possível realizar todo o fluxo (Criar Equipe -> Adicionar Membros -> Remover Membros) sem erros?
-    - A listagem de equipes mostra corretamente o líder (a exibição é intuitiva)?
-- **UX/UI:**
-    - O sistema fornece feedback visual para ações do usuário (Loadings durante requisições, Toasts de sucesso/erro)?
-    - A interface lida bem com casos de borda (ex: lista vazia, erros de validação)?
-    - A navegação entre as páginas é fluida e intuitiva?
-- **Código:**
-    - A integração com o backend utiliza os tipos gerados/definidos corretamente?
-    - O código do frontend está organizado em componentes reutilizáveis?
+Neste tópico, validaremos a conformidade dos endpoints, o tratamento de cenários de borda e a organização estrutural do código.
 
-**4. Testes (Backend)**
-- Os testes de integração cobrem os fluxos principais (Criação, Edição, Remoção)?
-- Existem testes para os **cenários de erro** e violação de regras de negócio (ex: tentar inserir usuário em duas equipes)?
-- Os testes utilizam fixtures adequadas e limpam o banco após a execução?
-- *Nota:* A qualidade e cobertura dos testes no backend são fatores decisivos na avaliação.
+- **Contratos e Operações (CRUD):**
+    - A documentação automática está acessível e reflete os endpoints disponíveis?
+    - As operações de criação, leitura, atualização e exclusão respeitam a semântica HTTP e tratam corretamente identificadores inexistentes?
+- **Comportamento e Regras de Negócio:**
+    - O sistema trata conflitos de integridade ao tentar duplicar atribuições exclusivas, como a liderança?
+    - A lógica de gerenciamento de membros valida vínculos pré-existentes e impede a remoção inconsistente de líderes ativos?
+- **Qualidade de Código e Segurança:**
+    - Existe uma camada de abstração clara (ex: Repository) isolando as rotas da manipulação direta do banco?
+    - A aplicação utiliza recursos do ORM e Schemas de validação para garantir segurança contra injeção e consistência na tipagem de dados?
 
-**5. Processo & Documentação (IA_LOG)**
-- O arquivo `IA_LOG.md` existe e descreve as interações com clareza?
-- **Pensamento Crítico:** O candidato identificou e corrigiu sugestões ruins da IA? (Este é um ponto eliminatório/classificatório importante).
-- O README contém instruções claras se houver passos extras para rodar o projeto?
+**3. Frontend & Experiência do Usuário**
 
----
+Neste tópico, validaremos a implementação da interface, a fluidez da navegação e a organização arquitetural do código cliente.
 
-## 5. Entregáveis
+- **Funcionalidades e Fluxos de Tela:**
+    - A interface permite o ciclo completo de gerenciamento (CRUD) de Usuários e Equipes?
+    - As telas de detalhes permitem manipular a composição dos times e visualizam dados relacionados (ex: nomes de líderes) de forma intuitiva?
+- **UX e Feedback Visual:**
+    - A navegação entre módulos ocorre de forma fluida (SPA), sem recarregamentos totais da página?
+    - O sistema fornece feedback visual imediato para estados de carregamento, erros de negócio e sucesso nas operações?
+- **Arquitetura e Qualidade de Código:**
+    - A comunicação com a API está centralizada e desacoplada dos componentes visuais?
+    - O projeto prioriza a reutilização de componentes, a tipagem estática dos dados e a ausência de configurações rígidas (hardcoded)?
 
-1.  Uma **branch** com `seu-nome-sobrenome`.
-2.  Código fonte completo com a implementação.
-3.  Arquivo **`IA_LOG.md`** na raiz do projeto contendo:
-    - Breve descrição dos prompts utilizados.
-    - **Item Obrigatório:** Cite pelo menos um exemplo onde a IA sugeriu código incorreto, inseguro ou que violava uma regra de negócio, e descreva como você identificou e corrigiu o problema. Queremos avaliar seu senso crítico.
-4.  Arquivo **`DESCRIPTION_LOG.md`** o qual vai narrar seu processo criativo, com base em quais etapas você escolheu seguir, em qual ordem e o porquê de grandes decisões arquiteturais, ou decisões que você julga relevantes para o conhecimento do avaliador. Esse passo à passo pode ser bem objetivo, é mais para mapear o que de fato foi feito e direcionar a correção do avaliador.
+**4. Testes Automatizados & Qualidade**
+
+Neste tópico, verificaremos a cobertura de testes de integração e a confiabilidade dos mecanismos de validação do sistema.
+
+- **Cobertura de Fluxos Críticos:** Os testes validam corretamente o ciclo de vida dos usuários, equipes e a movimentação de membros?
+- **Cenários de Exceção:** A suíte garante que as violações de regras de negócio sejam bloqueadas conforme esperado?
+- **Infraestrutura e Isolamento:** O ambiente de testes gerencia corretamente o estado do banco, garantindo independência e limpeza entre as execuções?
+
+**5. Versionamento & Documentação**
+
+Neste tópico, avaliaremos a organização do histórico de mudanças e a transparência do processo de desenvolvimento assistido.
+
+- **Histórico de Versões (Git):** Os commits são atômicos e descrevem com clareza o propósito de cada alteração?
+- **Registro de Desenvolvimento (IA Log):**
+    - A documentação narra o processo criativo e as decisões arquiteturais tomadas?
+    - O registro demonstra pensamento crítico na análise de erros e na validação das sugestões geradas por IA?
 
 ## Development & License
 Consulte `development.md` para instruções de setup local.
