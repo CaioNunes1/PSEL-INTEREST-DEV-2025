@@ -15,13 +15,9 @@ help: ## Show this help message
 	@echo ""
 	@echo "$(GREEN)Environments:$(NC)"
 	@echo "  $(YELLOW)dev$(NC)      - Development (hot-reload, localhost)"
-	@echo "  $(YELLOW)staging$(NC)  - Staging local tests (Traefik, HTTPS, production-like)"
-	@echo ""
-	@echo "$(YELLOW)Note:$(NC) Production deploy uses GitHub Actions (not local commands)"
 	@echo ""
 	@echo "$(GREEN)Usage examples:$(NC)"
 	@echo "  make dev-up          # Start development environment"
-	@echo "  make staging-up      # Start staging environment locally"
 	@echo "  make dev-logs        # Show development logs"
 	@echo "  make clean           # Clean all containers and volumes"
 
@@ -63,15 +59,8 @@ clean: ## Clean all containers, volumes and networks
 		echo "$(GREEN)Cleanup completed!$(NC)"; \
 	fi'
 
-config-dev: ## Show merged development configuration
+config: ## Show merged development configuration
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml config
-
-config-staging: ## Show merged staging configuration
-	@if [ ! -f .env.staging ]; then \
-		echo "$(RED)Error: .env.staging not found$(NC)"; \
-		exit 1; \
-	fi
-	docker compose --env-file .env.staging -f docker-compose.yml -f docker-compose.traefik.yml -f docker-compose.staging.yml config
 
 # Backend specific commands
 backend-shell: ## Open backend shell (dev)
@@ -88,16 +77,16 @@ frontend-logs: ## Show frontend logs (dev)
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml logs -f frontend
 
 # Database commands
-dev-db-shell: ## Open database shell (dev)
+db-shell: ## Open database shell (dev)
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec db psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-app}
 
-dev-db-backup: ## Backup database (dev, custom format)
+db-backup: ## Backup database (dev, custom format)
 	@echo "$(GREEN)Creating database backup...$(NC)"
 	@mkdir -p ./backups
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec -T db pg_dump -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-app} -Fc > ./backups/backup_$$(date +%Y%m%d_%H%M%S).dump
 	@echo "$(GREEN)Backup created in ./backups/ (custom format)$(NC)"
 
-dev-db-restore: ## Restore database from backup (usage: make db-restore FILE=backup.dump)
+db-restore: ## Restore database from backup (usage: make db-restore FILE=backup.dump)
 	@if [ -z "$(FILE)" ]; then \
 		echo "$(RED)Error: FILE parameter required$(NC)"; \
 		echo "Usage: make db-restore FILE=./backups/backup_20240101_120000.dump"; \
@@ -118,11 +107,6 @@ pull: ## Pull latest images
 rebuild: ## Rebuild and restart (usage: make rebuild ENV=dev)
 	@echo "$(GREEN)Rebuilding $(ENV) environment...$(NC)"
 	docker compose -f docker-compose.yml -f docker-compose.$(ENV).yml up -d --build
-
-generate-client: ## Generate OpenAPI client (requires backend running)
-	@echo "$(GREEN)Generating OpenAPI client...$(NC)"
-	@bash scripts/generate-client.sh
-	@echo "$(GREEN)Client generated successfully!$(NC)"
 
 prune: ## Remove unused Docker resources
 	@echo "$(YELLOW)Removing unused Docker resources...$(NC)"
