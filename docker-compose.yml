@@ -56,7 +56,6 @@ services:
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - EMAILS_FROM_NAME=${EMAILS_FROM_NAME?Variable not set}
-      - SENTRY_DSN=${SENTRY_DSN}
 
   backend:
     build:
@@ -86,7 +85,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
-      - SENTRY_DSN=${SENTRY_DSN}
 
   frontend:
     build:
