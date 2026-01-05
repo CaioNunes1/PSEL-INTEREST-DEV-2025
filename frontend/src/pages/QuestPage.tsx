@@ -6,7 +6,7 @@ import { quests } from '../data/questsData'
 const QuestPage: React.FC = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  
+
   const quest = quests.find(q => q.id === id)
 
   if (!quest) {
