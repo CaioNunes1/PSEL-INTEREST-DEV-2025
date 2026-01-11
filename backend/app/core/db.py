@@ -1,16 +1,20 @@
-from sqlmodel import Session, create_engine
-from sqlmodel import SQLModel
-
+# backend/app/core/db.py
+from sqlmodel import Session, create_engine, SQLModel
+from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
-engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+# Configuração para PostgreSQL (SEM check_same_thread!)
+engine = create_engine(
+    settings.SQLALCHEMY_DATABASE_URI,
+    echo=True
+    # NÃO use connect_args para PostgreSQL!
+)
 
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# certifique-se de que todos os modelos SQLModel sejam importados (app.models)
-# antes de inicializar o DB caso contrário, o SQLModel pode falhar ao
-# inicializar os relacionamentos corretamente para mais detalhes:
-# https://github.com/fastapi/full-stack-fastapi-template/issues/28
+def get_session():
+    with SessionLocal() as session:
+        yield session
 
-
-def init_db(session: Session) -> None:
+def create_db_and_tables():
     SQLModel.metadata.create_all(engine)

@@ -2,6 +2,8 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+import os
+import sys
 
 # este é o objeto de configuração do Alembic, que fornece
 # acesso aos valores dentro do arquivo .ini em uso.
@@ -26,6 +28,20 @@ target_metadata = SQLModel.metadata
 # podem ser adquiridos:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+# importe as models para popular SQLModel.metadata
+try:
+    import app.models  # garante que Team / UserTeam sejam registrados
+except Exception:
+    pass
+
+# IMPORTANTE: usar metadata do SQLModel
+from sqlmodel import SQLModel
+target_metadata = SQLModel.metadata
 
 
 def get_url():

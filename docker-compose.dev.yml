@@ -1,47 +1,58 @@
-# Development environment overrides
+version: "3.8"
+
 services:
   db:
+    image: postgres:15
     restart: "no"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changethis
+      POSTGRES_DB: app
     ports:
-      - "5432:5432"
+      - "5433:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
   adminer:
+    image: adminer:latest
     restart: "no"
     ports:
       - "8080:8080"
 
   prestart:
-    # Ensure prestart runs on the same network so it can reach the DB by hostname
+    image: alpine:latest
+    command: >
+      sh -c "apk add --no-cache netcat-openbsd >/dev/null 2>&1 &&
+             until nc -z db 5432; do echo waiting for db; sleep 1; done"
+    depends_on:
+      - db
 
   backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     restart: "no"
     ports:
-      - "8000:8000"
-    command:
-      - fastapi
-      - run
-      - --reload
-      - "app/main.py"
+      - "8001:8000"
+    command: >
+      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
-      - ./backend:/app
-      - /app/.venv  # Prevent host .venv from overwriting container's
+      - ./backend:/app           # montamos código do host para dev
+      - /app/.venv               # preserva venv no container (não sobrescreve)
     env_file:
-      - .env
+      - .env                     # garanta ter .env no mesmo diretório onde roda o compose
     environment:
-      # Override SMTP for mailcatcher in dev
-      - SMTP_HOST=mailcatcher
-      - SMTP_PORT=1025
-      - SMTP_TLS=false
-      # Override database connection to use container name
       - POSTGRES_SERVER=db
+    depends_on:
+      - prestart
 
   frontend:
-    restart: "no"
-    ports:
-      - "5173:5173"
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    restart: "no"
+    ports:
+      - "5173:5173"
     command: npm run dev -- --host 0.0.0.0
     volumes:
       - ./frontend:/app
@@ -49,3 +60,6 @@ services:
     environment:
       - NODE_ENV=development
       - VITE_API_BASE=http://localhost:8000
+
+volumes:
+  db-data:
