@@ -15,6 +15,20 @@ def read_users(
 ):
     return crud.get_users_with_team_info(db, skip=skip, limit=limit)
 
+@router.get("/{user_id}", response_model=UserWithTeam)
+def read_user(
+    *,
+    db: Session = Depends(get_db),
+    user_id: int
+):
+    user_data = crud.get_user(db, user_id=user_id)
+    if not user_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado"
+        )
+    return user_data
+
 @router.post("/", response_model=UserRead)
 def create_user(
     *,
