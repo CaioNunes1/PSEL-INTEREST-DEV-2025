@@ -297,3 +297,24 @@ def get_team_with_members(db: Session, team_id: int) -> Optional[dict]:
         "member_count": len(members_info),
         "members": members_info
     }
+# backend/app/crud.py - Adicione esta função no final
+def delete_team(db: Session, team_id: int) -> Optional[Team]:
+    db_team = get_team(db, team_id)
+    if not db_team:
+        return None
+    
+    # Primeiro deleta todas as associações de membros
+    from app.models import UserTeam
+    statement = select(UserTeam).where(UserTeam.team_id == team_id)
+    result = db.execute(statement)
+    associations = result.scalars().all()
+    
+    for association in associations:
+        db.delete(association)
+    
+    db.commit()
+    
+    # Agora deleta a equipe
+    db.delete(db_team)
+    db.commit()
+    return db_team
