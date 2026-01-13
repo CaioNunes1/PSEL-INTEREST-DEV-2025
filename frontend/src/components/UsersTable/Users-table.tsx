@@ -1,24 +1,37 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
-import { Badge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Button';
-import { User } from '../../types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/Table';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { User } from '../../types/index';
+import { HiPencil, HiTrash } from 'react-icons/hi';
 
 interface UsersTableProps {
   users: User[];
+  onEditUser: (user: User) => void;
+  onDeleteUser: (id: number) => void;
 }
 
-export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+export const UsersTable: React.FC<UsersTableProps> = ({ 
+  users, 
+  onEditUser, 
+  onDeleteUser 
+}) => {
+  const handleDelete = (id: number, name: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o usuário "${name}"?`)) {
+      onDeleteUser(id);
+    }
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User</TableHead>
+            <TableHead>Usuário</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Team</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Equipe</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -42,7 +55,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                     user.is_active ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-700"
                   }
                 >
-                  {user.is_active ? 'Active' : 'Inactive'}
+                  {user.is_active ? 'Ativo' : 'Inativo'}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -51,20 +64,43 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
                     {user.team_name}
                   </Link>
                 ) : (
-                  <span className="text-sm text-muted-foreground">No team</span>
+                  <span className="text-sm text-muted-foreground">Sem equipe</span>
                 )}
               </TableCell>
               <TableCell className="text-right">
-                <Button asChild variant="outline" size="sm">
-                  <Link to={`/users/${user.id}`}>View Profile</Link>
-                </Button>
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => onEditUser(user)}
+                    title="Editar usuário"
+                  >
+                    <HiPencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Link to={`/users/${user.id}`}>Ver</Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-800"
+                    onClick={() => handleDelete(user.id, user.full_name)}
+                    title="Excluir usuário"
+                  >
+                    <HiTrash className="w-4 h-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
           {users.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="h-24 text-center">
-                <p className="text-sm text-muted-foreground">No users found</p>
+                <p className="text-sm text-muted-foreground">Nenhum usuário encontrado</p>
               </TableCell>
             </TableRow>
           )}

@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Badge } from '../components/ui/Badge';
 import { userService } from '../services/userService';
 import { teamService } from '../services/teamServices';
-import { User, Team } from '../types/index';
-import { HiArrowLeft } from 'react-icons/hi';
-import { TransferUserButton } from '../components/TransferUserButton/TransferUserButton';
+import { User, Team, UserUpdate } from '../types/index';
+import { HiArrowLeft, HiPencil, HiTrash } from 'react-icons/hi';
 import { Button } from '../components/ui/Button';
+import UserFormModal from '../components/Users/UserForm';
 
 const UserDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +19,7 @@ const UserDetailPage: React.FC = () => {
   const [transferLoading, setTransferLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -51,6 +52,32 @@ const UserDetailPage: React.FC = () => {
       setTeams(data);
     } catch (err) {
       console.error('Error fetching teams:', err);
+    }
+  };
+
+  const handleUpdateUser = async (userData: UserUpdate) => {
+    if (!user) return Promise.reject(new Error('Nenhum usuário selecionado'));
+
+    try {
+      const updatedUser = await userService.updateUser(user.id, userData);
+      setUser(updatedUser);
+      setError(null);
+      return Promise.resolve();
+    } catch (err: any) {
+      return Promise.reject(err);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!user || !window.confirm(`Tem certeza que deseja excluir o usuário "${user.full_name}"?`)) {
+      return;
+    }
+
+    try {
+      await userService.deleteUser(user.id);
+      navigate('/users');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Erro ao excluir usuário');
     }
   };
 
@@ -153,15 +180,34 @@ const UserDetailPage: React.FC = () => {
 
   return (
     <div className="p-8">
-      <div className="mb-8">
+      <div className="mb-8 flex items-center justify-between">
         <Button
           variant="ghost"
           onClick={() => navigate('/users')}
-          className="mb-4 pl-0"
+          className="pl-0"
         >
           <HiArrowLeft className="w-4 h-4 mr-2" />
           Voltar para Usuários
         </Button>
+        
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsEditModalOpen(true)}
+            className="flex items-center"
+          >
+            <HiPencil className="w-4 h-4 mr-2" />
+            Editar
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleDeleteUser}
+            className="flex items-center text-red-600 hover:text-red-800"
+          >
+            <HiTrash className="w-4 h-4 mr-2" />
+            Excluir
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -370,6 +416,13 @@ const UserDetailPage: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      <UserFormModal
+        user={user}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSubmit={handleUpdateUser}
+      />
     </div>
   );
 };
