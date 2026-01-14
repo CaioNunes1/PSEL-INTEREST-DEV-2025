@@ -22,7 +22,6 @@
 * Validações de negócio (ex.: 1 usuário por equipe, líder único)
 * Testes automatizados completos com padrão **Arrange‑Act‑Assert**
 * Fixtures para setup limpo nos testes
-
 ---
 
 ## Índice
@@ -134,6 +133,17 @@ pytest --cov=app --cov-report=html --cov-report=term-missing
 
 ---
 
+## :computer: Frontend
+
+O frontend (React + Vite) está configurado para rodar na porta **5174**.
+
+* URL padrão: `http://localhost:5174`
+* A API backend deve estar acessível em `http://localhost:8001`
+
+> 💡 Caso utilize variáveis de ambiente no frontend, configure a base URL da API corretamente.
+
+---
+
 ## :satellite: Endpoints principais
 
 **Documentação interativa**
@@ -202,7 +212,7 @@ curl "http://localhost:8001/api/v1/teams/"
 * Backend: `8001:8000`
 * PostgreSQL: `5433:5432`
 * Adminer: `8080:8080`
-* Frontend (se aplicável): `5173:5173`
+* Frontend (se aplicável): `5174:5174`
 
 **Arquivos principais**
 
@@ -293,4 +303,3 @@ pytest --cache-clear
 ---
 
 > Se quiser, eu posso: 1) gerar uma versão em inglês; 2) adicionar badges (build, coverage); 3) transformar em `README.md` com seções de contribuição e deploy — diga qual opção prefere.
-
