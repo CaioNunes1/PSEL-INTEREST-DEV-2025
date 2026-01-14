@@ -13,6 +13,7 @@ app = FastAPI(
 origins = [
 
     "http://localhost:5174",
+    "http://localhost:5173",
     # Adicione outras origens se necessário
 ]
 
