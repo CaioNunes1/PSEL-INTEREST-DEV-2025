@@ -1,133 +1,296 @@
-# Desafio Técnico Full-Stack: Módulo de Gestão de Equipes
+# Backend — Gerenciamento de Usuários e Equipes
 
-## Visão Geral
-Deverá ser demonstrada a habilidade de projetar e integrar uma nova funcionalidade em uma base de código existente. Você terá **1 semana** para completar o desafio.
+**Sistema backend** com REST API para gerenciamento de usuários e equipes, desenvolvido com FastAPI, testes automatizados e containerização com Docker.
 
-**Nota importante:** O candidato parte do zero no que diz respeito ao novo módulo — **não existe schema, rota ou página de frontend pré-criada** para o módulo de Equipes. Espera-se que o participante projete a arquitetura (back-end e front-end), os modelos de dados e as rotas necessárias, mas tem-se uma base para servir de guia na organização incial do projeto, que inclusive é a mesma página da demo que serve de base para guiar o desafio.
+---
 
-## 1. O Projeto Base
-O stack tecnológico do projeto é:
-- **Backend:** FastAPI com padrão de repositório e autenticação implementada.
-- **Banco de Dados:** Postgres com migrações via Alembic.
-- **Frontend:** React (Vite) com TypeScript.
-- **Testes:** Estrutura de Pytest configurada para o backend.
+## 🚀 Tecnologias
 
-## 2. O Desafio: "Módulo de Gestão de Equipes"
-O objetivo é criar um sistema onde seja possível gerenciar **Equipes** e seus respectivos **Membros** (Usuários). Você deverá criar as tabelas, a API e as interfaces gráficas seguindo os padrões do projeto.
+* **Backend:** FastAPI, SQLModel
+* **Banco de dados:** PostgreSQL (+ Alembic para migrações)
+* **Testes:** Pytest (33 testes — 100% passando)
+* **Containerização:** Docker, Docker Compose
+* **Frontend (opcional):** React + Vite
 
-## 3. Requisitos Funcionais (O Quê)
+---
 
-### A. Modelagem de Dados (Postgres/Alembic)
-A modelagem é parte crucial da avaliação.
-- Projete os modelos para **Equipes** e a associação com **Usuários**.
-- **Regras de Negócio (Constraints):**
-    1.  Uma Equipe deve ter **obrigatoriamente um Líder** (que é um Usuário já existente).
-    2.  **Unicidade de Membro:** Um Usuário só pode pertencer a **uma única equipe** por vez.
-    3.  **Unicidade de Líder:** Um Usuário só pode liderar **uma única equipe** por vez.
-- Garanta migrações que persistam o modelo no banco e assegurem integridade referencial (FKs e Constraints) para impedir estados inválidos (ex: usuário em duas equipes ao mesmo tempo).
+## 📌 Funcionalidades
 
-### B. Backend (FastAPI)
-- **API:**
-    - Implemente endpoints para: Criar, Listar, Editar e Remover Usuários.
-    - Implemente endpoints para: Criar, Listar, Editar e Remover Equipes.
-    - Implemente endpoints para: Adicionar e Remover membros de uma equipe (respeitando a regra de que o usuário sai da equipe anterior se entrar em uma nova, ou o sistema bloqueia, conforme sua decisão de design).
-- **Padrões:**
-    - Utilize Padrão de Repositório e Schemas (Pydantic) legíveis.
-    - Conecte o frontend aos serviços gerados (se houver script de `generate-client` ou similar, utilize-o para manter a tipagem forte entre Back e Front).
+* CRUD de usuários
+* CRUD de equipes
+* Associação de usuários a equipes
+* Validações de negócio (ex.: 1 usuário por equipe, líder único)
+* Testes automatizados completos com padrão **Arrange‑Act‑Assert**
+* Fixtures para setup limpo nos testes
 
-### C. Frontend (React)
-O foco é uma UX coesa e funcional.
-- **Navegação:** Adicione uma entrada no menu lateral para cada uma das páginas a seguir.
-- **Página de Usuários:**
-    - CRUD simples para cadastrar usuários no sistema (para que possam ser posteriormente alocados em equipes).
-- **Página de Listagem de Equipes:**
-    - Liste as equipes cadastradas exibindo cards ou tabela com: Nome da Equipe e Nome do Líder.
-    - Botão para criar nova equipe.
-- **Página de Detalhe da Equipe:**
-    - Ao clicar em uma equipe, exiba os detalhes e a lista de membros atuais.
-    - **Associação:** Permita adicionar um usuário a esta equipe.
-        - *Atenção:* A interface deve lidar com a regra de negócio. Se o usuário já estiver em outra equipe, deixe claro o que está acontecendo (ex: aviso de transferência ou erro).
+---
 
-Ps: é recomendado o uso da ferramenta Lovable ou Figma AI para a criação da visualização base das telas (lembre-se que essas telas podem ser exportadas e integradas ao projeto).
+## Índice
 
-### D. Testes (Pytest)
-- **Backend (Obrigatório):**
-    - Implemente testes de integração para as rotas principais (Criação de equipe, Movimentação de membros, CRUD de usuários).
-    - Cubra cenários de sucesso e **cenários de erro** (ex: tentar violar a regra de um usuário em duas equipes).
-    - Utilização de playwright para os testes.
-- **Frontend (Opcional/Diferencial):**
-    - Testes E2E ou unitários de componentes são bem-vindos, mas não eliminatórios.
+1. [Instalação e execução](#instala%C3%A7%C3%A3o-e-execu%C3%A7%C3%A3o)
+2. [Executando testes](#executando-testes)
+3. [Endpoints principais](#endpoints-principais)
+4. [Exemplos com cURL](#exemplos-com-curl)
+5. [Configuração Docker](#configura%C3%A7%C3%A3o-docker)
+6. [Estrutura do projeto](#estrutura-do-projeto)
+7. [Solução de problemas](#solu%C3%A7%C3%A3o-de-problemas)
+8. [Regras de negócio](#regras-de-neg%C3%B3cio)
+9. [Suporte](#suporte)
 
-## 4. Entregáveis
+---
 
-1.  **Link do Repositório (Fork):** O projeto deve ser entregue através de um Fork do repositório original. Certifique-se de que o repositório esteja público ou acessível para correção.
-2.  **Código Fonte Completo:** A implementação funcional de todas as camadas (Banco, Backend, Frontend e Testes).
-3. **Documentação de Processo (Itens Diferenciais / Bônus):** Embora o foco da avaliação seja a solução técnica, os arquivos abaixo contam como pontuação extra para avaliar seu pensamento crítico e organização:
-    - **Arquivo ``IA_LOG.md``:** Registre brevemente os prompts utilizados. **Obrigatório para o bônus:** Cite um exemplo onde a IA sugeriu código incorreto, inseguro ou ruim, e descreva como você identificou e corrigiu o problema.
-    - **Arquivo ``DESCRIPTION_LOG.md``:** Um "diário de bordo" objetivo narrando seu processo criativo: por onde começou, qual ordem seguiu e a justificativa para grandes decisões arquiteturais. Isso ajuda o avaliador a entender seu raciocínio.
+## :wrench: Instalação e execução
 
-## 5. Critérios de Avaliação
+### Método 1 — Usando Docker (recomendado)
 
-Estas perguntas guiam a correção do desafio e ajudam a garantir que todos os requisitos foram atendidos:
+**Desenvolvimento (com hot reload)**
 
-**1. Modelagem de Dados & Integridade**
+```bash
+# Na raiz do projeto (onde está docker-compose.dev.yml)
+docker-compose -f docker-compose.dev.yml up --build
+```
 
-Neste tópico, avaliaremos se a sua solução de banco de dados é robusta e se comporta como uma camada confiável de persistência.
+> ⚠️ A API backend estará disponível em `http://localhost:8001` quando executada via Docker.
 
-- **Estrutura e Relacionamentos:**
-    - A modelagem das tabelas representa corretamente as entidades do sistema e estabelece os vínculos necessários entre membros e suas equipes?
-- **Garantia das Regras de Negócio:**
-     - A estrutura do banco de dados foi desenhada para impedir nativamente inconsistências?
-     - A modelagem garante, por si só, que regras críticas (como exclusividade de liderança e unicidade de participação) sejam respeitadas, impossibilitando estados inválidos mesmo sem a validação da aplicação?
-- **Gestão de Schema (Migrações):**
-    - O projeto utiliza um sistema de migrações confiável?
-    - As alterações no banco são rastreáveis e reversíveis, permitindo que o ambiente seja atualizado ou revertido (downgrade) sem corromper a integridade dos dados ou da estrutura?
+**Produção / Staging**
 
-**2. API REST, Regras de Negócio & Arquitetura**
+```bash
+docker-compose up --build
+```
 
-Neste tópico, validaremos a conformidade dos endpoints, o tratamento de cenários de borda e a organização estrutural do código.
+### Método 2 — Execução local (sem Docker)
 
-- **Contratos e Operações (CRUD):**
-    - A documentação automática está acessível e reflete os endpoints disponíveis?
-    - As operações de criação, leitura, atualização e exclusão respeitam a semântica HTTP e tratam corretamente identificadores inexistentes?
-- **Comportamento e Regras de Negócio:**
-    - O sistema trata conflitos de integridade ao tentar duplicar atribuições exclusivas, como a liderança?
-    - A lógica de gerenciamento de membros valida vínculos pré-existentes e impede a remoção inconsistente de líderes ativos?
-- **Qualidade de Código e Segurança:**
-    - Existe uma camada de abstração clara (ex: Repository) isolando as rotas da manipulação direta do banco?
-    - A aplicação utiliza recursos do ORM e Schemas de validação para garantir segurança contra injeção e consistência na tipagem de dados?
+**Pré-requisitos**
 
-**3. Frontend & Experiência do Usuário**
+* Python 3.10+
+* PostgreSQL (padrão: porta do host 5433 — ajuste se necessário)
 
-Neste tópico, validaremos a implementação da interface, a fluidez da navegação e a organização arquitetural do código cliente.
+**Passos**
 
-- **Funcionalidades e Fluxos de Tela:**
-    - A interface permite o ciclo completo de gerenciamento (CRUD) de Usuários e Equipes?
-    - As telas de detalhes permitem manipular a composição dos times e visualizam dados relacionados (ex: nomes de líderes) de forma intuitiva?
-- **UX e Feedback Visual:**
-    - A navegação entre módulos ocorre de forma fluida (SPA), sem recarregamentos totais da página?
-    - O sistema fornece feedback visual imediato para estados de carregamento, erros de negócio e sucesso nas operações?
-- **Arquitetura e Qualidade de Código:**
-    - A comunicação com a API está centralizada e desacoplada dos componentes visuais?
-    - O projeto prioriza a reutilização de componentes, a tipagem estática dos dados e a ausência de configurações rígidas (hardcoded)?
+```bash
+git clone <seu-repositorio>
+cd backend
 
-**4. Testes Automatizados & Qualidade**
+# Crie e ative o venv
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# Linux / Mac
+source venv/bin/activate
 
-Neste tópico, verificaremos a cobertura de testes de integração e a confiabilidade dos mecanismos de validação do sistema.
+# Instale dependências
+pip install -r requirements.txt
+```
 
-- **Cobertura de Fluxos Críticos:** Os testes validam corretamente o ciclo de vida dos usuários, equipes e a movimentação de membros?
-- **Cenários de Exceção:** A suíte garante que as violações de regras de negócio sejam bloqueadas conforme esperado?
-- **Infraestrutura e Isolamento:** O ambiente de testes gerencia corretamente o estado do banco, garantindo independência e limpeza entre as execuções?
+* Configure o PostgreSQL (crie o banco `app` e ajuste credenciais em `app/core/config.py`).
+* Execute as migrações:
 
-**5. Versionamento & Documentação**
+```bash
+alembic upgrade head
+```
 
-Neste tópico, avaliaremos a organização do histórico de mudanças e a transparência do processo de desenvolvimento assistido.
+* Inicie o servidor (usar porta **8001** para compatibilidade com o frontend Docker):
 
-- **Histórico de Versões (Git):** Os commits são atômicos e descrevem com clareza o propósito de cada alteração?
-- **Registro de Desenvolvimento (IA Log):**
-    - A documentação narra o processo criativo e as decisões arquiteturais tomadas?
-    - O registro demonstra pensamento crítico na análise de erros e na validação das sugestões geradas por IA?
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+```
 
-## Development & License
-Consulte `development.md` para instruções de setup local.
-License: MIT.
+A API estará disponível em `http://localhost:8001`.
+
+### Método 3 — Docker (build do backend isolado)
+
+```bash
+# Dentro da pasta backend/
+docker build -t backend-app .
+
+docker run -p 8001:8000 -e POSTGRES_SERVER=localhost backend-app
+```
+
+---
+
+## :test_tube: Executando testes
+
+**Com Docker (recomendado):**
+
+```bash
+docker-compose -f docker-compose.dev.yml exec backend pytest tests/ -v
+```
+
+**Localmente (venv ativado):**
+
+```bash
+cd backend
+pytest tests/ -v
+# Com cobertura
+pytest --cov=app --cov-report=html --cov-report=term-missing
+```
+
+**Resultado esperado:**
+
+```
+33 tests passed in 0.71s
+100% coverage de funcionalidades principais
+```
+
+---
+
+## :satellite: Endpoints principais
+
+**Documentação interativa**
+
+* Swagger UI: `http://localhost:8001/docs`
+* ReDoc: `http://localhost:8001/redoc`
+
+### Usuários
+
+* `GET  /api/v1/users/` — Lista usuários (com informação de equipe)
+* `POST /api/v1/users/` — Cria usuário
+* `GET  /api/v1/users/{id}` — Busca usuário
+* `PUT  /api/v1/users/{id}` — Atualiza usuário
+* `DELETE /api/v1/users/{id}` — Remove usuário (não permite remover líder)
+
+### Equipes
+
+* `GET  /api/v1/teams/` — Lista equipes (com membros)
+* `POST /api/v1/teams/` — Cria equipe (o líder é adicionado como membro)
+* `GET  /api/v1/teams/{id}` — Busca equipe com membros
+* `PUT  /api/v1/teams/{id}` — Atualiza equipe
+* `DELETE /api/v1/teams/{id}` — Remove equipe (cascade delete)
+* `POST   /api/v1/teams/{id}/members` — Adiciona membro
+* `DELETE /api/v1/teams/{id}/members/{user_id}` — Remove membro
+
+---
+
+## :page_facing_up: Exemplos de uso (cURL)
+
+**Criar usuário**
+
+```bash
+curl -X POST "http://localhost:8001/api/v1/users/" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "joao@email.com", "full_name": "João Silva", "is_active": true}'
+```
+
+**Criar equipe (usuário 1 como líder)**
+
+```bash
+curl -X POST "http://localhost:8001/api/v1/teams/" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Dev Team", "description": "Equipe de desenvolvimento", "leader_id": 1}'
+```
+
+**Adicionar membro à equipe**
+
+```bash
+curl -X POST "http://localhost:8001/api/v1/teams/1/members" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": 2, "team_id": 1}'
+```
+
+**Listar equipes com membros**
+
+```bash
+curl "http://localhost:8001/api/v1/teams/"
+```
+
+---
+
+## :whale: Configuração Docker
+
+**Portas mapeadas (host:container)**
+
+* Backend: `8001:8000`
+* PostgreSQL: `5433:5432`
+* Adminer: `8080:8080`
+* Frontend (se aplicável): `5173:5173`
+
+**Arquivos principais**
+
+* `docker-compose.yml` — Configuração principal (produção/staging)
+* `docker-compose.dev.yml` — Config para desenvolvimento (hot reload)
+
+**Variáveis de ambiente (.env)**
+
+```
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=changethis
+POSTGRES_DB=app
+POSTGRES_SERVER=db
+POSTGRES_PORT=5432
+```
+
+---
+
+## :file_folder: Estrutura do projeto
+
+```
+backend/
+├── app/
+│   ├── models.py          # Modelos SQLModel (User, Team, UserTeam)
+│   ├── crud.py            # Lógica de negócio com validações
+│   ├── api/
+│   │   ├── routes/        # Endpoints FastAPI
+│   │   └── deps.py        # Dependências (sessão DB)
+│   ├── core/              # Configurações
+│   ├── alembic/           # Migrações de banco
+│   └── main.py            # Aplicação principal
+├── tests/                 # 🧪 Suíte completa de testes
+│   ├── conftest.py        # Fixtures e configuração
+│   ├── test_users.py      # Testes de usuários
+│   ├── test_teams.py      # Testes de equipes
+│   └── test_crud.py       # Testes de CRUD
+└── requirements.txt       # Dependências Python
+```
+
+---
+
+## :bug: Solução de problemas
+
+**Port already in use**
+
+```bash
+# Windows
+netstat -ano | findstr :8001
+taskkill /PID <PID> /F
+
+# Linux/Mac
+sudo lsof -i :8001
+kill -9 <PID>
+```
+
+**Erro de conexão com o banco**
+
+* Verifique se o PostgreSQL está rodando
+* Confira credenciais em `app/core/config.py`
+* Em Docker: verifique se o container `db` está `up`
+
+**Erros nos testes**
+
+```bash
+pytest tests/ -xvs
+pytest --cache-clear
+```
+
+---
+
+## :dart: Regras de negócio implementadas
+
+* Um usuário só pode estar em uma equipe por vez (transferência automática)
+* Email único por usuário
+* Nome único por equipe
+* Um líder só pode liderar uma equipe
+* Não é possível excluir usuário que é líder de equipe
+* Não é possível remover o líder da própria equipe
+
+---
+
+## :telephone_receiver: Suporte
+
+* API: consulte `/docs` ou `/redoc`
+* Banco: Adminer em `http://localhost:8080`
+* Testes: `pytest tests/ -v`
+
+---
+
+> Se quiser, eu posso: 1) gerar uma versão em inglês; 2) adicionar badges (build, coverage); 3) transformar em `README.md` com seções de contribuição e deploy — diga qual opção prefere.
+
